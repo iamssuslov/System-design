@@ -1,4 +1,4 @@
-[submodule "Lab_1/structurizr-ui"]
+[submodule "Lab_1/structurizr-lite"]
 	path = Lab_1/structurizr-lite
 	url = https://github.com/structurizr/lite/
 [submodule "Lab_1/structurizr-ui"]
