@@ -78,6 +78,27 @@ workspace {
             include *
             autoLayout
         }
+        
+        dynamic FileManagementSystem {
+            title "Создание пользователя"
+            user -> API "Делает запрос к"
+            API -> UserController "Создаёт пользователя с помощью"
+            autoLayout
+        }
+        
+        dynamic FileManagementSystem {
+            title "Создание файла"
+            user -> API "Делает запрос к"
+            API -> FileController "Создаёт файл с помощью"
+            autoLayout
+        }
+    
+        dynamic FileManagementSystem {
+            title "Создание папки"
+            user -> API "Делает запрос к"
+            API -> FolderController "Создаёт папку с помощью"
+            autoLayout
+        }
 
         theme default
     }
