@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  user_service:
+    build:
+      context: ../Lab_2/user_service  # Путь к директории с Dockerfile для управления юзерами
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+
+  file_service:
+    build:
+      context: ../Lab_2/file_service  # Путь к директории с Dockerfile для управления файлами
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    networks:
+      - app-network
+
+  db:
+    image: postgres:latest
+    container_name: postgres_db
+    environment:
+      - POSTGRES_DB=your_db_name
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=your_password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db_data:
