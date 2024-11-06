@@ -1,20 +1,19 @@
-# Используем образ с Python 3.11
 FROM python:3.11-slim
 
-# Устанавливаем рабочую директорию внутри контейнера
+FROM ubuntu:22.04
+
+RUN apt-get update && apt-get install -y python3-pip netcat
+
 WORKDIR user_service/
 
-# Копируем файлы зависимостей в контейнер
 COPY requirements.txt .
 
-# Устанавливаем зависимости
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем все файлы проекта в контейнер
 COPY . .
 
-# Объявляем порт, который будет прослушивать контейнер
 EXPOSE 5000
 
-# Выполняем команду для запуска приложения
-CMD ["python3", "app.py"]
+RUN chmod +x run.sh
+
+CMD ["./run.sh"]

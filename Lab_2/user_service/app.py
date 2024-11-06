@@ -10,17 +10,7 @@ app.config['JSON_AS_ASCII'] = False
 db.init_app(app)
 jwt = JWTManager(app)
 
-# Создание таблиц и администратора перед первым запросом
-@app.before_first_request
-def create_tables():
-    db.create_all()
-    if not User.query.filter_by(username='admin').first():
-        admin = User(username='admin')
-        admin.set_password('secret')
-        db.session.add(admin)
-        db.session.commit()
 
-# Эндпоинт для регистрации пользователя
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -35,7 +25,7 @@ def register():
 
     return jsonify({'message': 'Пользователь успешно зарегистрирован'}), 201
 
-# Эндпоинт для авторизации пользователя
+
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -48,5 +38,6 @@ def login():
 
     return jsonify({'message': 'Неверные учетные данные'}), 401
 
+
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
