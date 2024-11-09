@@ -11,12 +11,7 @@ app.config['JSON_AS_ASCII'] = False
 db.init_app(app)
 jwt = JWTManager(app)
 
-# Создание таблиц перед первым запросом
-@app.before_first_request
-def create_tables():
-    db.create_all()
 
-# Эндпоинт для создания папки
 @app.route('/folders', methods=['POST'])
 @jwt_required()
 def create_folder():
@@ -33,7 +28,7 @@ def create_folder():
 
     return jsonify({'message': 'Папка успешно создана', 'folder_id': folder.id}), 201
 
-# Эндпоинт для получения содержимого папки
+
 @app.route('/folders/<int:folder_id>', methods=['GET'])
 @jwt_required()
 def get_folder_contents(folder_id):
@@ -54,7 +49,6 @@ def get_folder_contents(folder_id):
 
     return jsonify({'subfolders': subfolders, 'files': files}), 200
 
-# Эндпоинт для загрузки файла
 
 @app.route('/files', methods=['POST'])
 @jwt_required()
@@ -85,7 +79,7 @@ def upload_file():
 
     return jsonify({'message': 'Файл успешно загружен', 'file_id': new_file.id}), 201
 
-# Эндпоинт для скачивания файла
+
 @app.route('/files/<int:file_id>', methods=['GET'])
 @jwt_required()
 def download_file(file_id):
@@ -100,5 +94,6 @@ def download_file(file_id):
     response.headers.set('Content-Disposition', 'attachment', filename=file.filename)
     return response
 
+
 if __name__ == '__main__':
-    app.run(port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)

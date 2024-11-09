@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  user_service:
+    build:
+      context: ../Lab_2/user_service
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+    depends_on:
+      - db
+
+  file_service:
+    build:
+      context: ../Lab_2/file_service
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    networks:
+      - app-network
+    depends_on:
+      - db
+
+  db:
+    image: postgres:latest
+    container_name: postgres_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+
+  post-init:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - app-network
+    depends_on:
+      - db
+      - user_service
+      - file_service
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db_data:
