@@ -1,13 +1,13 @@
-from flask_sqlalchemy import SQLAlchemy
+from flask_mongoengine import MongoEngine
+from mongoengine import IntField, StringField
 from werkzeug.security import generate_password_hash, check_password_hash
 
-db = SQLAlchemy()
+db = MongoEngine()
 
-class User(db.Model):
-    __tablename__ = 'users'  # Имя таблицы в базе данных
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), unique=True, nullable=False)
-    password_hash = db.Column(db.String(512), nullable=False)
+class User(db.Document):
+    id = IntField(primary_key=True)
+    username = StringField(unique=True, null=False)
+    password_hash = StringField(max_length=512, null=False)
 
     # Метод для установки пароля
     def set_password(self, password):

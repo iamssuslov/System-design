@@ -15,13 +15,12 @@ jwt = JWTManager(app)
 def register():
     data = request.get_json()
 
-    if User.query.filter_by(username=data['username']).first():
+    if User.objects(username=data['username']).first():
         return jsonify({'message': 'Пользователь уже существует'}), 400
 
     user = User(username=data['username'])
     user.set_password(data['password'])
-    db.session.add(user)
-    db.session.commit()
+    user.save()
 
     return jsonify({'message': 'Пользователь успешно зарегистрирован'}), 201
 
@@ -30,7 +29,7 @@ def register():
 def login():
     data = request.get_json()
 
-    user = User.query.filter_by(username=data['username']).first()
+    user = User.objects(username=data['username']).first()
 
     if user and user.check_password(data['password']):
         access_token = create_access_token(identity=user.id)

@@ -2,7 +2,7 @@
 
 set -x
 
-while ! nc -z db 5432; do
+while ! nc -z mongo-db 27017; do
   echo "Ожидаем запуска базы данных..."
   sleep 1
 done

@@ -1,11 +1,9 @@
-from models import db, User
-from app import app
+from models import User
+from mongoengine import connect, disconnect
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        if not User.query.filter_by(username='admin').first():
-            admin = User(username='admin')
-            admin.set_password('secret')
-            db.session.add(admin)
-            db.session.commit()
+    connect(host='mongodb://mongo-db:27017/users_db')
+    user = User(id=1, username='admin')
+    user.set_password('secret')
+    user.save()
+    disconnect('users_db')

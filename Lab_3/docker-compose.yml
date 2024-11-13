@@ -46,9 +46,22 @@ services:
       - user_service
       - file_service
 
+  mongo-db:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+      - ../Lab_4/initdb:/docker-entrypoint-initdb.d
+      - ../Lab_4/initdb/data.json:/docker-entrypoint-initdb.d/data.json
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
 
 volumes:
   db_data:
+  mongo-data:
