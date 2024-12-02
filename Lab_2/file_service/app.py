@@ -1,8 +1,7 @@
 from flask import Flask, request, jsonify, make_response
-from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 from config import Config
-from models import db, Folder, File
+from models import db, Folder, File, get_from_cache_or_db
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -21,7 +20,7 @@ def create_folder():
     folder = Folder(
         name=data['name'],
         parent_id=data.get('parent_id'),
-        owner_id=user_id
+        owner_id=int(user_id)
     )
     db.session.add(folder)
     db.session.commit()
@@ -33,18 +32,18 @@ def create_folder():
 @jwt_required()
 def get_folder_contents(folder_id):
     user_id = get_jwt_identity()
-    folder = Folder.query.filter_by(id=folder_id, owner_id=user_id).first()
+    folder = get_from_cache_or_db(f'folders_data_{user_id}_{folder_id}', Folder.query.filter_by(id=folder_id, owner_id=int(user_id)).first, Folder)
 
     if not folder:
         return jsonify({'message': 'Папка не найдена'}), 404
 
     subfolders = [
         {'id': f.id, 'name': f.name}
-        for f in folder.subfolders if f.owner_id == user_id
+        for f in folder.subfolders if f.owner_id == int(user_id)
     ]
     files = [
         {'id': f.id, 'filename': f.filename}
-        for f in folder.files if f.owner_id == user_id
+        for f in folder.files if f.owner_id == int(user_id)
     ]
 
     return jsonify({'subfolders': subfolders, 'files': files}), 200
@@ -64,7 +63,7 @@ def upload_file():
     if not folder_id:
         return jsonify({'message': 'Не указан folder_id'}), 400
 
-    folder = Folder.query.filter_by(id=folder_id, owner_id=user_id).first()
+    folder = Folder.query.filter_by(id=folder_id, owner_id=int(user_id)).first()
     if not folder:
         return jsonify({'message': 'Папка не найдена'}), 404
 
@@ -72,7 +71,7 @@ def upload_file():
         filename=file.filename,
         content=file.read(),
         folder_id=folder_id,
-        owner_id=user_id
+        owner_id=int(user_id)
     )
     db.session.add(new_file)
     db.session.commit()
@@ -84,7 +83,7 @@ def upload_file():
 @jwt_required()
 def download_file(file_id):
     user_id = get_jwt_identity()
-    file = File.query.filter_by(id=file_id, owner_id=user_id).first()
+    file = get_from_cache_or_db(f'files_data_{user_id}_{file_id}', File.query.filter_by(id=file_id, owner_id=int(user_id)).first, File)
 
     if not file:
         return jsonify({'message': 'Файл не найден'}), 404
